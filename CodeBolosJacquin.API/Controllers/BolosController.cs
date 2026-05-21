@@ -85,6 +85,46 @@ namespace CodeBolosJacquin.API.Controllers
 
 
 
+        [HttpPost]
+        public async Task<IActionResult> Post(BoloRequestViewModel request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var bolo = await _boloRepository.CadastrarAsync(request);
+                    return CreatedAtAction(nameof(GetById), new { id = bolo.id }, bolo);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensagem = "Ocorreu um erro ao Cadastrar o bolo.", erro = ex.Message });
+            }
+        }
+
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var resultado = await _boloRepository.RemoverAsync(id);
+                
+                if (!resultado)
+                    return NotFound(new { mensagem = "Bolo não encontrado" });
+                
+                return Ok(new { mensagem = "Bolo deletado com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensagem = "Ocorreu um erro ao excluir o bolo.", erro = ex.Message });
+            }
+        }
 
 
 
